@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XP3.js ServiceWorker Demo</title>
+</head>
+<body>
+    <script>
+        navigator.serviceWorker.register('/test/sw_proxy.php');
+        if(!navigator.serviceWorker.controller) {
+            (async() => {
+                document.body.innerHTML = '<h1>Please wait...</h1>';
+                window.stop();
+                await navigator.serviceWorker.ready;
+                location.reload();
+            })();
+        }
+    </script>
+    <h1>XP3.js SW</h1>
+    <p>ServiceWorkerを登録しました。これで普通のサーバ上にあるファイルのようにアーカイブ中のファイルにアクセスできます。</p>
+    <ul>
+        <li><a href="/test/.vfs/xp3/test1.xp3&gt;test1.png" target="_blank">test1.png</a></li>
+        <li><a href="/test/.vfs/xp3/test1.xp3&gt;テスト/これはテストファイルです.txt" target="_blank">テスト/これはテストファイルです.txt</a></li>
+        <li><a href="/test/.vfs/xp3/test1.xp3&gt;テスト.txt" target="_blank">テスト.txt</a></li>
+    </ul>
+    <p>また、<code>&lt;img&gt;</code>タグ等を用いて画像を表示することもできます。</p>
+    <img src="/test/.vfs/xp3/test1.xp3&gt;test1.png">
+</body>
+</html>

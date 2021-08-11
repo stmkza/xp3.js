@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XP3.js Demo</title>
+</head>
+<body>
+    <script src="../src/inflate.js"></script>
+    <script src="../src/xp3.js"></script>
+    <script src="../src/encoding.min.js"></script>
+    <script>
+        (async () => {
+            const path = '/test.php?file=test1.xp3';
+            const textPreviewExtensions = ['txt', 'tjs', 'ks'];
+            const imagePreviewExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            console.log(await loadXp3Files(path));
+
+            const meta = await loadXp3Files(path);
+            window.meta = meta;
+            document.write(`<h1>XP3 Viewer</h1>`);
+            for(const entry of meta.fileEntries) {
+                const name = entry['_fileName'];
+                const file = await getXp3File(path, name);
+                const blobUrl = window.URL.createObjectURL(new Blob([file]));
+                document.write(`<span style="font-size: 1.3em; font-weight: bold;">${name}</span> <a href="${blobUrl}" download="${name}">ダウンロード</a><br>`);
+                if(textPreviewExtensions.includes(name.split('.').pop().toLowerCase()) && entry.infoFileSizeValue <= 1024 && Encoding.detect(file) !== 'BINARY') {
+                    const convertedString = Encoding.convert(file, {
+                        to: 'UNICODE',
+                        type: 'string',
+                    });
+                    document.write(`<pre>${convertedString}</pre>`);
+                } else if(imagePreviewExtensions.includes(name.split('.').pop().toLowerCase())) {
+                    document.write(`<img src="${blobUrl}">`);
+                } else {
+                    document.write(`<span style="color: red">ブラウザでは表示できません</span>`);
+                }
+                document.write(`<hr>`);
+            }
+        })()
+    </script>
+</body>
+</html>

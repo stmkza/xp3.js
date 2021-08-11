@@ -1,6 +1,7 @@
 const XP3_CACHE_VERSION = 1;
 const XP3JS_BASE_PATH = '/src/';
-const XP3JS_DATA_BASE_PATH = '/data/file.php?name=';
+const XP3JS_VFS_BASE_PATH = '/test/.vfs/xp3/';
+const XP3JS_DATA_BASE_PATH = '/test.php?file=';
 
 importScripts(`${XP3JS_BASE_PATH}inflate.js`);
 importScripts(`${XP3JS_BASE_PATH}xp3.js`);
@@ -26,7 +27,7 @@ async function responseXp3File(archive, path)
                 'UTF8': 'UTF-8',
                 'EUCJP': 'EUC-JP',
                 'SJIS': 'Shift_JIS',
-            })[Encoding.detect(utf8Array)];
+            })[Encoding.detect(buf)];
             if(charset) contentType = `text/plain;charset=${charset}`;
             break;
         case 'png':
@@ -58,8 +59,8 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', function(event) {
     const url = new URL(event.request.url);
-    if(!url.pathname.startsWith(`${XP3JS_BASE_PATH}.vfs/xp3/`)) return;
-    const requestedPath = decodeURIComponent(url.pathname).substring(`${XP3JS_BASE_PATH}.vfs/xp3/`.length);
+    if(!url.pathname.startsWith(XP3JS_VFS_BASE_PATH)) return;
+    const requestedPath = decodeURIComponent(url.pathname).substring(XP3JS_VFS_BASE_PATH.length);
     const delimiterIndex = requestedPath.indexOf('>');
     if(delimiterIndex === -1) return;
     const [archive, path] = [requestedPath.substring(0, delimiterIndex), requestedPath.substring(delimiterIndex + 1)];
