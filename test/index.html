@@ -19,17 +19,24 @@
             const meta = await loadXp3Files(path);
             window.meta = meta;
             document.write(`<h1>XP3 Viewer</h1>`);
+            document.write(`<style>
+            .preview-text {
+                overflow: auto;
+                max-height: 8em;
+                border: solid 1px #303030;
+            }
+            </style>`);
             for(const entry of meta.fileEntries) {
                 const name = entry['_fileName'];
                 const file = await getXp3File(path, name);
                 const blobUrl = window.URL.createObjectURL(new Blob([file]));
                 document.write(`<span style="font-size: 1.3em; font-weight: bold;">${name}</span> <a href="${blobUrl}" download="${name}">ダウンロード</a><br>`);
-                if(textPreviewExtensions.includes(name.split('.').pop().toLowerCase()) && entry.infoFileSizeValue <= 1024 && Encoding.detect(file) !== 'BINARY') {
+                if(textPreviewExtensions.includes(name.split('.').pop().toLowerCase()) && Encoding.detect(file) !== 'BINARY') {
                     const convertedString = Encoding.convert(file, {
                         to: 'UNICODE',
                         type: 'string',
                     });
-                    document.write(`<pre>${convertedString}</pre>`);
+                    document.write(`<div class="preview-text"><pre>${convertedString}</pre></div>`);
                 } else if(imagePreviewExtensions.includes(name.split('.').pop().toLowerCase())) {
                     document.write(`<img src="${blobUrl}">`);
                 } else {
